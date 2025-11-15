@@ -57,7 +57,7 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <Header showActions={true} />
         <main className="mx-auto max-w-7xl px-6 py-8">
           <div className="text-center text-muted-foreground">Loading...</div>
         </main>
@@ -67,7 +67,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header showActions={true} />
       <main className="mx-auto max-w-7xl px-6 py-8">
         {selectedUrl ? (
           <UrlDetailPanel
