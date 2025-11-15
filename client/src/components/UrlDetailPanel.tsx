@@ -25,6 +25,7 @@ interface ReferrerData {
 }
 
 interface UrlDetailPanelProps {
+  linkId: string;
   shortCode: string;
   destination: string;
   created: string;
@@ -35,6 +36,7 @@ interface UrlDetailPanelProps {
 }
 
 export function UrlDetailPanel({
+  linkId,
   shortCode,
   destination,
   created,
