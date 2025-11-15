@@ -1,0 +1,198 @@
+{
+  "theme": {
+    "name": "SFS Family Theme",
+    "version": "1.0.0",
+    "description": "Luxurious gold on dark marble brown-black with circuit flow animations"
+  },
+  "colors": {
+    "brand": {
+      "black": {
+        "hsl": "0 0% 8%",
+        "hex": "#141414",
+        "rgb": "20, 20, 20"
+      },
+      "brown": {
+        "hsl": "25 15% 12%",
+        "hex": "#221E1A",
+        "rgb": "34, 30, 26"
+      },
+      "gold": {
+        "hsl": "45 100% 51%",
+        "hex": "#FFD700",
+        "rgb": "255, 215, 0"
+      },
+      "goldLight": {
+        "hsl": "45 100% 65%",
+        "hex": "#FFE666",
+        "rgb": "255, 230, 102"
+      },
+      "goldDark": {
+        "hsl": "45 95% 38%",
+        "hex": "#C4A000",
+        "rgb": "196, 160, 0"
+      }
+    },
+    "text": {
+      "primary": {
+        "hsl": "40 20% 95%",
+        "hex": "#F7F5F2",
+        "description": "Warm beige-white for primary text"
+      },
+      "secondary": {
+        "hsl": "40 15% 75%",
+        "hex": "#C9C3BB",
+        "description": "Muted beige for secondary text"
+      },
+      "muted": {
+        "hsl": "40 10% 55%",
+        "hex": "#928B81",
+        "description": "Subtle beige-grey for muted text"
+      }
+    },
+    "semantic": {
+      "success": {
+        "hsl": "142 76% 36%",
+        "hex": "#16A34A"
+      },
+      "warning": {
+        "hsl": "43 96% 56%",
+        "hex": "#F59E0B"
+      },
+      "error": {
+        "hsl": "0 84% 60%",
+        "hex": "#EF4444"
+      },
+      "info": {
+        "hsl": "45 100% 51%",
+        "hex": "#FFD700",
+        "note": "Uses brand gold"
+      }
+    }
+  },
+  "spacing": {
+    "unit": "0.25rem",
+    "scale": {
+      "0": "0",
+      "1": "0.25rem",
+      "2": "0.5rem",
+      "3": "0.75rem",
+      "4": "1rem",
+      "6": "1.5rem",
+      "8": "2rem",
+      "12": "3rem",
+      "16": "4rem",
+      "20": "5rem",
+      "24": "6rem"
+    },
+    "container": {
+      "maxWidth": "1400px",
+      "padding": {
+        "mobile": "1.5rem",
+        "desktop": "2rem"
+      }
+    }
+  },
+  "borderRadius": {
+    "sm": "0.1875rem",
+    "md": "0.375rem",
+    "lg": "0.5625rem",
+    "xl": "0.75rem",
+    "full": "9999px"
+  },
+  "typography": {
+    "fontFamily": {
+      "sans": ["Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+      "serif": ["Georgia", "serif"],
+      "mono": ["JetBrains Mono", "Menlo", "monospace"]
+    },
+    "fontSize": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
+      "4xl": "2.25rem",
+      "5xl": "3rem",
+      "6xl": "3.75rem"
+    },
+    "fontWeight": {
+      "normal": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "lineHeight": {
+      "tight": 1.2,
+      "normal": 1.6,
+      "relaxed": 1.8
+    },
+    "letterSpacing": {
+      "tight": "-0.02em",
+      "normal": "0",
+      "wide": "0.02em"
+    }
+  },
+  "shadows": {
+    "gold": "0 4px 20px rgba(212, 175, 55, 0.15)",
+    "goldLg": "0 8px 40px rgba(212, 175, 55, 0.25)",
+    "goldGlow": "0 0 20px rgba(255, 215, 0, 0.2)",
+    "sm": "0 1px 2px rgba(0, 0, 0, 0.05)",
+    "md": "0 4px 6px rgba(0, 0, 0, 0.1)",
+    "lg": "0 10px 15px rgba(0, 0, 0, 0.15)",
+    "xl": "0 20px 25px rgba(0, 0, 0, 0.2)"
+  },
+  "glass": {
+    "background": "rgba(25, 20, 15, 0.6)",
+    "border": "rgba(212, 175, 55, 0.3)",
+    "blur": "16px",
+    "glow": "0 0 20px rgba(255, 215, 0, 0.2)"
+  },
+  "circuit": {
+    "nodeCount": "Calculated: (width * height) / 15000",
+    "colors": {
+      "primary": "rgba(255, 215, 0, 0.6)",
+      "secondary": "rgba(212, 175, 55, 0.4)",
+      "glow": "rgba(255, 215, 0, 0.8)",
+      "node": "rgba(255, 215, 0, 0.9)"
+    },
+    "animation": {
+      "speed": {
+        "drift": 0.5,
+        "pulse": 0.02
+      },
+      "maxConnection": "150px",
+      "fadeTrail": "rgba(0, 0, 0, 0.05)"
+    }
+  },
+  "transitions": {
+    "duration": {
+      "fast": "150ms",
+      "normal": "300ms",
+      "slow": "500ms"
+    },
+    "easing": {
+      "crickit": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "in": "cubic-bezier(0.4, 0, 1, 1)",
+      "out": "cubic-bezier(0, 0, 0.2, 1)",
+      "inOut": "cubic-bezier(0.4, 0, 0.2, 1)"
+    }
+  },
+  "breakpoints": {
+    "sm": "640px",
+    "md": "768px",
+    "lg": "1024px",
+    "xl": "1280px",
+    "2xl": "1536px"
+  },
+  "zIndex": {
+    "circuit": -1,
+    "base": 0,
+    "dropdown": 10,
+    "sticky": 20,
+    "modal": 50,
+    "popover": 60,
+    "tooltip": 70
+  }
+}

@@ -53,10 +53,10 @@ export function CreateUrlCard() {
   };
 
   return (
-    <Card>
+    <Card className="glass-card border-gold">
       <CardHeader className="gap-1 space-y-0 pb-4">
-        <CardTitle className="text-2xl">Create Short URL</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl text-gradient-gold">Create Short URL</CardTitle>
+        <CardDescription className="text-muted">
           Transform long URLs into shareable short links
         </CardDescription>
       </CardHeader>

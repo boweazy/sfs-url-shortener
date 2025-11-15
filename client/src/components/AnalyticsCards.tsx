@@ -36,17 +36,17 @@ export function AnalyticsCards({
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {stats.map((stat) => (
-        <Card key={stat.label}>
+        <Card key={stat.label} className="glass-card border-gold hover-elevate">
           <CardContent className="p-6">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-                <p className="text-4xl font-bold" data-testid={stat.testId}>
+                <p className="text-sm text-gold-light">{stat.label}</p>
+                <p className="text-4xl font-bold text-gradient-gold" data-testid={stat.testId}>
                   {stat.value}
                 </p>
               </div>
-              <div className="rounded-md bg-primary/10 p-2">
-                <stat.icon className="h-5 w-5 text-primary" />
+              <div className="rounded-md bg-primary/10 p-2 gold-glow">
+                <stat.icon className="h-5 w-5 text-gold" />
               </div>
             </div>
           </CardContent>
