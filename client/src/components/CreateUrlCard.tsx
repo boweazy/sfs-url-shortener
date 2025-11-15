@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Copy, Sparkles, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateLink } from "@/lib/api";
+import { LinkPreview } from "./LinkPreview";
 
 export function CreateUrlCard() {
   const [url, setUrl] = useState("");
@@ -73,6 +74,8 @@ export function CreateUrlCard() {
               data-testid="input-destination-url"
             />
           </div>
+
+          {url && <LinkPreview url={url} />}
 
           <div className="space-y-2">
             <Label htmlFor="custom-slug">

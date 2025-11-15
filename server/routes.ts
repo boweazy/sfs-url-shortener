@@ -55,6 +55,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes
   // -----------------
 
+  // POST /api/links/preview - Get metadata for a URL
+  app.post("/api/links/preview", async (req: Request, res: Response) => {
+    try {
+      const { url } = req.body;
+
+      if (!url) {
+        return res.status(400).json({ message: "URL required" });
+      }
+
+      // Import dynamically to avoid circular dependencies
+      const { fetchLinkMetadata } = await import("./metadata");
+      const metadata = await fetchLinkMetadata(url);
+
+      res.json(metadata);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch preview" });
+    }
+  });
+
   // GET /api/links - Get all links for a workspace
   app.get("/api/links", async (req: Request, res: Response) => {
     try {
