@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link2, Zap, Shield, BarChart3, QrCode, Sparkles, ArrowRight, Check } from "lucide-react";
 import { Link } from "wouter";
+import { Header } from "@/components/Header";
 
 export default function LandingPage() {
   const features = [
@@ -87,6 +88,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen">
+      <Header showActions={false} />
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 md:py-32">
         <div className="container mx-auto px-6">
@@ -206,7 +208,7 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 bg-marble">
+      <section id="pricing" className="py-20 bg-marble">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
