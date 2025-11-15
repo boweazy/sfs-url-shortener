@@ -6,55 +6,37 @@ import { UrlTable, type UrlItem } from "@/components/UrlTable";
 import { UrlDetailPanel } from "@/components/UrlDetailPanel";
 import { EmptyState } from "@/components/EmptyState";
 import { Card } from "@/components/ui/card";
+import { useLinks, useDeleteLink } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const [selectedUrl, setSelectedUrl] = useState<UrlItem | null>(null);
-  const [urls, setUrls] = useState<UrlItem[]>([
-    {
-      id: "1",
-      shortCode: "docs",
-      destination: "https://example.com/documentation/getting-started",
-      clicks: 245,
-      created: "Nov 10, 2025",
-    },
-    {
-      id: "2",
-      shortCode: "promo",
-      destination: "https://shop.example.com/summer-sale-2025",
-      clicks: 892,
-      created: "Nov 8, 2025",
-    },
-    {
-      id: "3",
-      shortCode: "app",
-      destination: "https://app.example.com/dashboard",
-      clicks: 156,
-      created: "Nov 5, 2025",
-    },
-  ]);
+  const { data: linksData, isLoading } = useLinks();
+  const deleteLink = useDeleteLink();
+  const { toast } = useToast();
+  const urls = linksData || [];
 
-  const handleCreateUrl = (data: { url: string; customSlug: string; generateQr: boolean }) => {
-    const newUrl: UrlItem = {
-      id: Date.now().toString(),
-      shortCode: data.customSlug,
-      destination: data.url,
-      clicks: 0,
-      created: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    };
-    setUrls([newUrl, ...urls]);
-    console.log("New URL created:", newUrl);
-  };
-
-  const handleDeleteUrl = (id: string) => {
-    setUrls(urls.filter((url) => url.id !== id));
-    if (selectedUrl?.id === id) {
-      setSelectedUrl(null);
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteLink.mutateAsync(id);
+      if (selectedUrl?.id === id) {
+        setSelectedUrl(null);
+      }
+      toast({
+        title: "Success",
+        description: "Link deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete link",
+        variant: "destructive",
+      });
     }
-    console.log("URL deleted:", id);
   };
 
   const totalClicks = urls.reduce((sum, url) => sum + url.clicks, 0);
-  const clicksToday = 143;
+  const clicksToday = 0; // Would need real-time tracking for this
 
   const mockClickHistory = [
     { date: "Nov 8", clicks: 12 },
@@ -72,12 +54,24 @@ export default function Dashboard() {
     { source: "Direct", clicks: 42 },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-7xl px-6 py-8">
+          <div className="text-center text-muted-foreground">Loading...</div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="mx-auto max-w-7xl px-6 py-8">
         {selectedUrl ? (
           <UrlDetailPanel
+            linkId={selectedUrl.id}
             shortCode={selectedUrl.shortCode}
             destination={selectedUrl.destination}
             created={selectedUrl.created}
@@ -94,7 +88,7 @@ export default function Dashboard() {
               clicksToday={clicksToday}
             />
 
-            <CreateUrlCard onSubmit={handleCreateUrl} />
+            <CreateUrlCard />
 
             {urls.length === 0 ? (
               <Card>
@@ -106,10 +100,9 @@ export default function Dashboard() {
                 <UrlTable
                   urls={urls}
                   onUrlClick={setSelectedUrl}
-                  onDelete={handleDeleteUrl}
+                  onDelete={handleDelete}
                   onViewQr={(url) => {
                     setSelectedUrl(url);
-                    console.log("View QR for:", url);
                   }}
                 />
               </div>

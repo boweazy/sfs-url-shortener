@@ -4,31 +4,44 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Copy, Sparkles } from "lucide-react";
+import { Copy, Sparkles, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCreateLink } from "@/lib/api";
+import { LinkPreview } from "./LinkPreview";
 
-interface CreateUrlCardProps {
-  onSubmit?: (data: { url: string; customSlug: string; generateQr: boolean }) => void;
-}
-
-export function CreateUrlCard({ onSubmit }: CreateUrlCardProps) {
+export function CreateUrlCard() {
   const [url, setUrl] = useState("");
   const [customSlug, setCustomSlug] = useState("");
   const [generateQr, setGenerateQr] = useState(true);
   const [generatedUrl, setGeneratedUrl] = useState("");
   const { toast } = useToast();
+  const createLink = useCreateLink();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const shortCode = customSlug || Math.random().toString(36).substring(2, 8);
-    const shortUrl = `${window.location.origin}/${shortCode}`;
-    setGeneratedUrl(shortUrl);
-    
-    if (onSubmit) {
-      onSubmit({ url, customSlug: shortCode, generateQr });
+
+    try {
+      const result = await createLink.mutateAsync({
+        url,
+        customSlug: customSlug || undefined,
+        qrCodeEnabled: generateQr,
+      });
+
+      setGeneratedUrl(result.link.shortUrl);
+      setUrl("");
+      setCustomSlug("");
+
+      toast({
+        title: "Success!",
+        description: "Short URL created successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create link",
+        variant: "destructive",
+      });
     }
-    
-    console.log("URL created:", { url, customSlug: shortCode, generateQr });
   };
 
   const handleCopy = () => {
@@ -61,6 +74,8 @@ export function CreateUrlCard({ onSubmit }: CreateUrlCardProps) {
               data-testid="input-destination-url"
             />
           </div>
+
+          {url && <LinkPreview url={url} />}
 
           <div className="space-y-2">
             <Label htmlFor="custom-slug">
@@ -97,9 +112,23 @@ export function CreateUrlCard({ onSubmit }: CreateUrlCardProps) {
             />
           </div>
 
-          <Button type="submit" className="w-full" data-testid="button-create-url">
-            <Sparkles className="mr-2 h-4 w-4" />
-            Create Short URL
+          <Button
+            type="submit"
+            className="w-full"
+            data-testid="button-create-url"
+            disabled={createLink.isPending}
+          >
+            {createLink.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Create Short URL
+              </>
+            )}
           </Button>
 
           {generatedUrl && (

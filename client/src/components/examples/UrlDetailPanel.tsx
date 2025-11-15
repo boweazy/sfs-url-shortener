@@ -20,6 +20,7 @@ export default function UrlDetailPanelExample() {
   return (
     <div className="p-6 max-w-7xl">
       <UrlDetailPanel
+        linkId="demo-link-id"
         shortCode="promo"
         destination="https://shop.example.com/summer-sale-2025"
         created="Nov 8, 2025"
