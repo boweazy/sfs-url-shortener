@@ -1,28 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ExternalLink, Copy } from "lucide-react";
+import { ArrowLeft, Copy, ExternalLink } from "lucide-react";
 import { QrCodeDisplay } from "./QrCodeDisplay";
 import { useToast } from "@/hooks/use-toast";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
-import { Badge } from "@/components/ui/badge";
 
-interface ClickData {
-  date: string;
-  clicks: number;
-}
-
-interface ReferrerData {
-  source: string;
-  clicks: number;
-}
+interface ClickData { date: string; clicks: number; }
+interface ReferrerData { source: string; clicks: number; }
 
 interface UrlDetailPanelProps {
   shortCode: string;
@@ -35,137 +19,129 @@ interface UrlDetailPanelProps {
 }
 
 export function UrlDetailPanel({
-  shortCode,
-  destination,
-  created,
-  totalClicks,
-  clickHistory = [],
-  referrers = [],
-  onBack,
+  shortCode, destination, created, totalClicks,
+  clickHistory = [], referrers = [], onBack,
 }: UrlDetailPanelProps) {
   const { toast } = useToast();
   const shortUrl = `${window.location.origin}/${shortCode}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shortUrl);
-    toast({
-      title: "Copied!",
-      description: "Short URL copied to clipboard",
-    });
+    toast({ title: "Copied!", description: "Short URL copied to clipboard" });
   };
 
   return (
-    <div className="space-y-6">
-      <Button
-        variant="ghost"
+    <div className="space-y-6 sfs-animate-fade-in">
+      <button
         onClick={onBack}
         data-testid="button-back"
+        className="flex items-center gap-2 text-sm font-medium rounded-full px-4 py-2 transition-all duration-150"
+        style={{ color: "rgba(255,215,0,0.80)", border: "1px solid rgba(255,215,0,0.25)", background: "rgba(255,215,0,0.06)" }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,215,0,0.14)"; (e.currentTarget as HTMLElement).style.color = "#FFD700"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,215,0,0.06)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,215,0,0.80)"; }}
       >
-        <ArrowLeft className="mr-2 h-4 w-4" />
+        <ArrowLeft className="h-4 w-4" />
         Back to all URLs
-      </Button>
+      </button>
 
       <div className="grid gap-6 lg:grid-cols-3">
+        {/* Left column */}
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader className="gap-1 space-y-0 pb-4">
-              <CardTitle>URL Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Short URL</p>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 font-mono text-sm bg-muted px-3 py-2 rounded-md" data-testid="text-short-url">
-                    {shortUrl}
-                  </code>
-                  <Button size="sm" variant="outline" onClick={handleCopy} data-testid="button-copy-detail">
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+          {/* URL details */}
+          <div className="glass-card rounded-2xl p-6 space-y-5">
+            <h2 className="text-xl font-bold gold-text">URL Details</h2>
 
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Destination</p>
-                <div className="flex items-center gap-2">
-                  <span className="flex-1 text-sm truncate">{destination}</span>
-                  <a
-                    href={destination}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-testid="link-destination-detail"
-                  >
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                  </a>
-                </div>
+            <div className="space-y-1">
+              <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "rgba(245,245,220,0.50)" }}>Short URL</p>
+              <div className="flex items-center gap-2">
+                <code
+                  className="flex-1 font-mono text-sm rounded-xl px-4 py-3"
+                  style={{ background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.20)", color: "#FFD700" }}
+                  data-testid="text-short-url"
+                >
+                  {shortUrl}
+                </code>
+                <button
+                  onClick={handleCopy}
+                  data-testid="button-copy-detail"
+                  className="shrink-0 rounded-xl p-3 transition-all"
+                  style={{ background: "rgba(255,215,0,0.10)", border: "1px solid rgba(255,215,0,0.25)", color: "#FFD700" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,215,0,0.20)"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,215,0,0.10)"; }}
+                >
+                  <Copy className="h-4 w-4" />
+                </button>
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Total Clicks</p>
-                  <p className="text-2xl font-bold" data-testid="text-detail-clicks">{totalClicks}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Created</p>
-                  <p className="text-sm">{created}</p>
-                </div>
+            <div className="space-y-1">
+              <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "rgba(245,245,220,0.50)" }}>Destination</p>
+              <div className="flex items-center gap-2">
+                <span className="flex-1 text-sm truncate" style={{ color: "rgba(245,245,220,0.80)" }}>{destination}</span>
+                <a href={destination} target="_blank" rel="noopener noreferrer" data-testid="link-destination-detail">
+                  <ExternalLink className="h-4 w-4 shrink-0" style={{ color: "rgba(245,245,220,0.40)" }} />
+                </a>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          <Card>
-            <CardHeader className="gap-1 space-y-0 pb-4">
-              <CardTitle>Click Analytics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={clickHistory}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis
-                      dataKey="date"
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--popover))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "6px",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="clicks"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                      dot={{ fill: "hsl(var(--primary))" }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="rounded-xl p-4" style={{ background: "rgba(255,215,0,0.06)", border: "1px solid rgba(255,215,0,0.15)" }}>
+                <p className="text-xs uppercase tracking-wider mb-1" style={{ color: "rgba(245,245,220,0.50)" }}>Total Clicks</p>
+                <p className="text-3xl font-bold gold-text" data-testid="text-detail-clicks">{totalClicks}</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="rounded-xl p-4" style={{ background: "rgba(255,215,0,0.06)", border: "1px solid rgba(255,215,0,0.15)" }}>
+                <p className="text-xs uppercase tracking-wider mb-1" style={{ color: "rgba(245,245,220,0.50)" }}>Created</p>
+                <p className="text-sm font-medium" style={{ color: "#F5F5DC" }}>{created}</p>
+              </div>
+            </div>
+          </div>
 
+          {/* Analytics chart */}
+          <div className="glass-card rounded-2xl p-6">
+            <h3 className="text-lg font-semibold gold-text mb-4">Click Analytics (Last 7 Days)</h3>
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={clickHistory}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,215,0,0.10)" />
+                  <XAxis dataKey="date" stroke="rgba(245,245,220,0.40)" fontSize={11} />
+                  <YAxis stroke="rgba(245,245,220,0.40)" fontSize={11} />
+                  <Tooltip
+                    contentStyle={{
+                      background: "rgba(59,47,47,0.95)",
+                      border: "1px solid rgba(255,215,0,0.30)",
+                      borderRadius: "10px",
+                      color: "#F5F5DC",
+                    }}
+                  />
+                  <Line type="monotone" dataKey="clicks" stroke="#FFD700" strokeWidth={2.5}
+                    dot={{ fill: "#FFD700", r: 4 }} activeDot={{ r: 6, fill: "#FFD700", stroke: "rgba(255,215,0,0.40)", strokeWidth: 4 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Referrers */}
           {referrers.length > 0 && (
-            <Card>
-              <CardHeader className="gap-1 space-y-0 pb-4">
-                <CardTitle>Top Referrers</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {referrers.map((ref, idx) => (
-                    <div key={idx} className="flex items-center justify-between">
-                      <span className="text-sm">{ref.source}</span>
-                      <Badge variant="secondary">{ref.clicks} clicks</Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="glass-card rounded-2xl p-6">
+              <h3 className="text-lg font-semibold gold-text mb-4">Top Referrers</h3>
+              <div className="space-y-3">
+                {referrers.map((ref, idx) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <span className="text-sm" style={{ color: "rgba(245,245,220,0.80)" }}>{ref.source}</span>
+                    <span
+                      className="text-xs font-semibold rounded-full px-2.5 py-0.5"
+                      style={{ background: "rgba(255,215,0,0.12)", color: "#FFD700", border: "1px solid rgba(255,215,0,0.25)" }}
+                    >
+                      {ref.clicks} clicks
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 
+        {/* Right column — QR */}
         <div>
           <QrCodeDisplay url={shortUrl} shortCode={shortCode} />
         </div>

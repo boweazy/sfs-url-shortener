@@ -1,40 +1,23 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
-import { apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Header } from "@/components/Header";
 import { CreateUrlCard } from "@/components/CreateUrlCard";
 import { AnalyticsCards } from "@/components/AnalyticsCards";
 import { UrlTable, type UrlItem } from "@/components/UrlTable";
 import { UrlDetailPanel } from "@/components/UrlDetailPanel";
 import { EmptyState } from "@/components/EmptyState";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
-interface AnalyticsSummary {
-  totalUrls: number;
-  totalClicks: number;
-  clicksToday: number;
-}
-
-interface UrlAnalytics {
-  chartData: { date: string; clicks: number }[];
-  referrers: { source: string; clicks: number }[];
-}
+interface AnalyticsSummary { totalUrls: number; totalClicks: number; clicksToday: number; }
+interface UrlAnalytics { chartData: { date: string; clicks: number }[]; referrers: { source: string; clicks: number }[]; }
 
 export default function Dashboard() {
   const [selectedUrl, setSelectedUrl] = useState<UrlItem | null>(null);
   const { toast } = useToast();
 
-  const { data: urls = [], isLoading: urlsLoading } = useQuery<UrlItem[]>({
-    queryKey: ["/api/urls"],
-  });
-
-  const { data: summary, isLoading: summaryLoading } = useQuery<AnalyticsSummary>({
-    queryKey: ["/api/analytics/summary"],
-  });
-
+  const { data: urls = [], isLoading: urlsLoading } = useQuery<UrlItem[]>({ queryKey: ["/api/urls"] });
+  const { data: summary } = useQuery<AnalyticsSummary>({ queryKey: ["/api/analytics/summary"] });
   const { data: urlAnalytics } = useQuery<UrlAnalytics>({
     queryKey: ["/api/urls", selectedUrl?.id, "analytics"],
     enabled: !!selectedUrl?.id,
@@ -71,16 +54,13 @@ export default function Dashboard() {
   });
 
   const handleCreate = (data: { url: string; customSlug: string; generateQr: boolean }) => {
-    createMutation.mutate({
-      destination: data.url,
-      shortCode: data.customSlug || undefined,
-    });
+    createMutation.mutate({ destination: data.url, shortCode: data.customSlug || undefined });
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ background: "#0D0D0D" }}>
       <Header />
-      <main className="mx-auto max-w-7xl px-6 py-8">
+      <main className="mx-auto max-w-7xl px-6 py-10">
         {selectedUrl ? (
           <UrlDetailPanel
             shortCode={selectedUrl.shortCode}
@@ -92,50 +72,32 @@ export default function Dashboard() {
             onBack={() => setSelectedUrl(null)}
           />
         ) : (
-          <div className="space-y-8">
-            {summaryLoading ? (
-              <div className="grid gap-6 md:grid-cols-3">
-                {[1, 2, 3].map((i) => (
-                  <Card key={i}>
-                    <CardContent className="p-6">
-                      <Skeleton className="h-8 w-24 mb-2" />
-                      <Skeleton className="h-10 w-16" />
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <AnalyticsCards
-                totalUrls={summary?.totalUrls ?? 0}
-                totalClicks={summary?.totalClicks ?? 0}
-                clicksToday={summary?.clicksToday ?? 0}
-              />
-            )}
-
-            <CreateUrlCard
-              onSubmit={handleCreate}
-              isPending={createMutation.isPending}
+          <div className="space-y-10">
+            {/* Stats */}
+            <AnalyticsCards
+              totalUrls={summary?.totalUrls ?? 0}
+              totalClicks={summary?.totalClicks ?? 0}
+              clicksToday={summary?.clicksToday ?? 0}
             />
 
+            {/* Create form */}
+            <CreateUrlCard onSubmit={handleCreate} isPending={createMutation.isPending} />
+
+            {/* URL list */}
             {urlsLoading ? (
-              <div className="space-y-3">
+              <div className="glass-card rounded-2xl p-8 space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-14 w-full rounded-md" />
+                  <div key={i} className="h-12 rounded-xl animate-pulse"
+                    style={{ background: "rgba(255,215,0,0.06)" }} />
                 ))}
               </div>
             ) : urls.length === 0 ? (
-              <Card>
-                <EmptyState
-                  onCreateClick={() => {
-                    document
-                      .getElementById("destination-url")
-                      ?.focus();
-                  }}
-                />
-              </Card>
+              <div className="glass-card rounded-2xl">
+                <EmptyState onCreateClick={() => document.getElementById("destination-url")?.focus()} />
+              </div>
             ) : (
               <div>
-                <h2 className="text-2xl font-semibold mb-6">Your URLs</h2>
+                <h2 className="text-2xl font-bold gold-text mb-6">Your URLs</h2>
                 <UrlTable
                   urls={urls}
                   onUrlClick={setSelectedUrl}
@@ -147,6 +109,12 @@ export default function Dashboard() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="mt-16 py-6 text-center text-xs" style={{ borderTop: "1px solid rgba(255,215,0,0.12)", color: "rgba(245,245,220,0.40)" }}>
+        <span>&copy; 2025 SmartFlow Systems. </span>
+        <span className="gold-text">AI-Powered Automation for Modern Businesses</span>
+      </footer>
     </div>
   );
 }

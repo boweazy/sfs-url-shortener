@@ -1,0 +1,79 @@
+/* SmartFlow Systems — UI Design System */
+:root {
+  --sfs-black:        #0D0D0D;
+  --sfs-brown:        #3B2F2F;
+  --sfs-gold:         #FFD700;
+  --sfs-gold-hover:   #E6C200;
+  --sfs-beige:        #F5F5DC;
+  --sfs-muted:        rgba(245,245,220,0.55);
+  --sfs-glass-bg:     rgba(59,47,47,0.65);
+  --sfs-glass-blur:   blur(16px) saturate(180%);
+  --sfs-glass-border: 1px solid rgba(255,215,0,0.20);
+  --sfs-font:         'Inter','Segoe UI',Roboto,sans-serif;
+  --sfs-gold-10:      rgba(255,215,0,0.10);
+  --sfs-gold-20:      rgba(255,215,0,0.20);
+  --sfs-gold-30:      rgba(255,215,0,0.30);
+  --sfs-gold-60:      rgba(255,215,0,0.60);
+  --sfs-shadow-sm:    0 2px 8px rgba(0,0,0,0.30);
+  --sfs-shadow-md:    0 4px 16px rgba(0,0,0,0.40);
+  --sfs-shadow-lg:    0 8px 32px rgba(0,0,0,0.50);
+  --sfs-shadow-gold:  0 8px 32px rgba(255,215,0,0.30);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: rgba(255,215,0,0.04); }
+::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.25); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,215,0,0.45); }
+
+/* Gold text gradient */
+.sfs-gold-text {
+  background: linear-gradient(135deg, #FFD700, #E6C200);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass card */
+.sfs-card {
+  background: var(--sfs-glass-bg);
+  backdrop-filter: var(--sfs-glass-blur);
+  border: 1px solid rgba(255,215,0,0.20);
+  border-top: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.08);
+  transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  overflow: hidden;
+}
+.sfs-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+.sfs-card:hover::before { transform: translateX(100%); }
+.sfs-card:hover {
+  border-color: rgba(255,215,0,0.50);
+  transform: translateY(-4px);
+  box-shadow: 0 0 24px rgba(255,215,0,0.20), 0 12px 48px rgba(0,0,0,0.50);
+}
+
+/* Animations */
+@keyframes sfs-fade-in { from { opacity:0; } to { opacity:1; } }
+@keyframes sfs-slide-up { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes sfs-scale-in { from { opacity:0; transform:scale(0.94); } to { opacity:1; transform:scale(1); } }
+
+.sfs-animate-fade-in  { animation: sfs-fade-in  0.6s ease both; }
+.sfs-animate-slide-up { animation: sfs-slide-up 0.6s ease both; }
+.sfs-animate-scale-in { animation: sfs-scale-in 0.5s ease both; }
+
+.sfs-stagger > *:nth-child(1) { animation: sfs-slide-up 0.5s 0.05s ease both; }
+.sfs-stagger > *:nth-child(2) { animation: sfs-slide-up 0.5s 0.12s ease both; }
+.sfs-stagger > *:nth-child(3) { animation: sfs-slide-up 0.5s 0.20s ease both; }
+.sfs-stagger > *:nth-child(4) { animation: sfs-slide-up 0.5s 0.28s ease both; }
+.sfs-stagger > *:nth-child(5) { animation: sfs-slide-up 0.5s 0.36s ease both; }
+.sfs-stagger > *:nth-child(6) { animation: sfs-slide-up 0.5s 0.40s ease both; }

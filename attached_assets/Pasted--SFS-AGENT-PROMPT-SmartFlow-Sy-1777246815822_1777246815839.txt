@@ -1,0 +1,421 @@
+====================================================================
+SFS AGENT PROMPT — SmartFlow Systems Full Theme & Design System
+Give this prompt to any agent working on an SFS repo.
+====================================================================
+
+You are applying the full SmartFlow Systems (SFS) brand design system
+to this project. Follow every step exactly.
+
+
+--------------------------------------------------------------------
+BRAND IDENTITY
+--------------------------------------------------------------------
+Company:   SmartFlow Systems
+Tagline:   AI-Powered Automation for Modern Businesses
+Tone:      Premium, dark, gold-accented. Professional but bold.
+
+Colour palette (use these EXACT hex values everywhere):
+  Background (black):  #0D0D0D
+  Surface (brown):     #3B2F2F
+  Accent (gold):       #FFD700
+  Gold hover:          #E6C200
+  Body text (beige):   #F5F5DC
+  Muted text:          rgba(245,245,220,0.55)
+
+Glass morphism recipe:
+  background:      rgba(59,47,47,0.65)
+  backdrop-filter: blur(16px) saturate(180%)
+  border:          1px solid rgba(255,215,0,0.20)
+  border-top:      1px solid rgba(255,255,255,0.15)
+
+Font stack:
+  'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif
+
+
+--------------------------------------------------------------------
+STEP 1 — FILE SETUP
+--------------------------------------------------------------------
+Create a folder called sfs-kit/ containing these four files
+(full source code for each is provided at the bottom of this prompt):
+
+  sfs-kit/sfs-ui.css    ← complete design system
+  sfs-kit/sfs-bg.js     ← self-injecting gold particle background
+  sfs-kit/sfs-nav.js    ← mobile hamburger toggle helper
+  sfs-kit/sfs-logo-nav.png ← official logo (get from existing repo)
+
+Place it at:
+  Plain HTML / Express:  public/sfs-kit/
+  React / Vite:          client/public/sfs-kit/
+  Next.js App Router:    public/sfs-kit/
+
+
+--------------------------------------------------------------------
+STEP 2 — WIRE UP HTML / LAYOUT
+--------------------------------------------------------------------
+Plain HTML or Express (add to every page):
+  In <head>:
+    <link rel="stylesheet" href="/sfs-kit/sfs-ui.css">
+  Before </body>:
+    <script src="/sfs-kit/sfs-bg.js"></script>
+    <script src="/sfs-kit/sfs-nav.js"></script>
+
+React / Vite (edit client/index.html):
+  In <head>:
+    <link rel="stylesheet" href="/sfs-kit/sfs-ui.css">
+  Before </body> (AFTER the module script):
+    <script src="/sfs-kit/sfs-bg.js"></script>
+
+Next.js App Router (edit app/layout.tsx):
+  import Script from 'next/script'
+  In <head> JSX: <link rel="stylesheet" href="/sfs-kit/sfs-ui.css"/>
+  In <body> after {children}:
+    <Script src="/sfs-kit/sfs-bg.js" strategy="lazyOnload"/>
+
+DO NOT add inline <style> or <script> blocks — CSP compliant only.
+
+
+--------------------------------------------------------------------
+STEP 3 — CSS DESIGN TOKENS (add to :root in your global CSS)
+--------------------------------------------------------------------
+:root {
+  --sfs-black:        #0D0D0D;
+  --sfs-brown:        #3B2F2F;
+  --sfs-gold:         #FFD700;
+  --sfs-gold-hover:   #E6C200;
+  --sfs-beige:        #F5F5DC;
+  --sfs-muted:        rgba(245,245,220,0.55);
+  --sfs-glass-bg:     rgba(59,47,47,0.65);
+  --sfs-glass-blur:   blur(16px) saturate(180%);
+  --sfs-glass-border: 1px solid rgba(255,215,0,0.20);
+  --sfs-font:         'Inter','Segoe UI',Roboto,sans-serif;
+
+  /* Transparency helpers */
+  --sfs-gold-10:  rgba(255,215,0,0.10);
+  --sfs-gold-20:  rgba(255,215,0,0.20);
+  --sfs-gold-30:  rgba(255,215,0,0.30);
+  --sfs-gold-60:  rgba(255,215,0,0.60);
+
+  /* Shadows */
+  --sfs-shadow-sm:   0 2px 8px  rgba(0,0,0,0.10);
+  --sfs-shadow-md:   0 4px 16px rgba(0,0,0,0.12);
+  --sfs-shadow-lg:   0 8px 32px rgba(0,0,0,0.15);
+  --sfs-shadow-xl:   0 12px 48px rgba(0,0,0,0.20);
+  --sfs-shadow-gold: 0 8px 32px rgba(255,215,0,0.30);
+}
+
+html { background: #0D0D0D; }
+body { background: transparent; color: var(--sfs-beige); font-family: var(--sfs-font); }
+
+
+--------------------------------------------------------------------
+STEP 4 — NAVBAR (HTML version)
+--------------------------------------------------------------------
+<nav class="sfs-nav">
+  <a href="/" class="sfs-nav-brand">
+    <img src="/sfs-kit/sfs-logo-nav.png" alt="SmartFlow Systems"
+         style="height:48px;width:auto;object-fit:contain;">
+  </a>
+
+  <!-- Hamburger (mobile only — shown by CSS at ≤768px) -->
+  <button class="sfs-nav-toggle" id="navToggle" aria-label="Open menu">&#9776;</button>
+
+  <div class="sfs-nav-links" id="navLinks">
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+    <a href="/pricing" class="sfs-btn sfs-btn-gold sfs-btn-sm">Get Started</a>
+  </div>
+</nav>
+
+Navbar CSS recipe (already in sfs-ui.css — do NOT duplicate):
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 4vw;
+  background: linear-gradient(135deg, rgba(13,13,13,.80), rgba(59,47,47,.60));
+  backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid rgba(255,215,0,.20);
+  box-shadow: 0 8px 32px rgba(0,0,0,.40);
+
+Mobile hamburger behaviour:
+  - Toggle button displays at ≤768px (CSS: display:none → display:block)
+  - Clicking adds class "open" to #navLinks via sfs-nav.js
+  - Menu drops down fullscreen dark panel with gold border
+  - Click outside dismisses it (handled by sfs-nav.js)
+
+
+--------------------------------------------------------------------
+STEP 5 — REACT HAMBURGER SIDEBAR (for CRM / dashboard apps)
+--------------------------------------------------------------------
+The full slide-in sidebar (for React/Vite apps) has these features:
+  • Burger icon (Menu) toggles to X (lucide-react icons)
+  • Semi-opaque dark overlay covers the page
+  • 320px (w-80) slide-in from the left, z-index 50
+  • Sections: Main Navigation, User Profile & Settings,
+              Admin & System Tools, Help & Resources
+  • Each item has a lucide icon + label
+  • Active item: gold-left-border + gold-tinted background
+  • User info panel at top (avatar circle + name + email)
+  • Sign Out button at the bottom
+
+Sidebar background:    bg-brown-900 (--sfs-brown = #3B2F2F)
+Sidebar border:        border-r border-gold-800/30
+Active item:           bg-gold-600/20 text-gold-100 border-l-2 border-gold-500
+Inactive item:         text-gold-300 hover:bg-gold-600/10
+Section headers:       text-gold-400 text-xs uppercase tracking-wider
+
+Nav items (CRM):
+  Main:    Dashboard, Pipeline, Leads, My Tasks
+  Profile: My Profile, Settings
+  Admin:   Admin Panel, Analytics, User Management
+  Help:    Help Center, Documentation, Contact Support, Contact Us
+
+Tailwind colour tokens needed in tailwind.config:
+  gold: {
+    100: 'hsl(51,100%,90%)',
+    300: 'hsl(47,100%,75%)',
+    400: 'hsl(45,100%,60%)',
+    500: 'hsl(51,100%,50%)',
+    600: 'hsl(51,100%,45%)',
+    700: 'hsl(45,100%,35%)',
+    800: 'hsl(40,100%,24%)',
+  },
+  brown: { 900: 'hsl(14,24%,23%)' }
+
+
+--------------------------------------------------------------------
+STEP 6 — GLASS CARD COMPONENTS
+--------------------------------------------------------------------
+Standard glass card:
+  <div class="sfs-card"> ... </div>
+
+  CSS:
+    background:      rgba(59,47,47,0.65)
+    backdrop-filter: blur(16px) saturate(180%)
+    border:          1px solid rgba(255,215,0,0.20)
+    border-top:      1px solid rgba(255,255,255,0.15)
+    border-radius:   16px
+    padding:         32px
+    box-shadow:      0 8px 32px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.12)
+    transition:      all 0.35s cubic-bezier(0.4,0,0.2,1)
+
+  Hover state:
+    border-color: rgba(255,215,0,0.50)
+    transform:    translateY(-4px)
+    box-shadow:   0 0 24px rgba(255,215,0,0.25), 0 12px 48px rgba(0,0,0,0.20)
+
+  Shimmer on hover (::before pseudo-element):
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)
+    Slides left→right on hover
+
+Card variants:
+  .sfs-card-featured  → gold-tinted gradient background, brighter border
+  .sfs-card-sm        → padding 16px, radius 12px
+  .sfs-card-lg        → padding 48px, radius 24px
+
+
+--------------------------------------------------------------------
+STEP 7 — BUTTONS
+--------------------------------------------------------------------
+Primary / Gold button:
+  <a class="sfs-btn sfs-btn-primary">Get Started</a>
+  background: linear-gradient(135deg, #FFD700, #E6C200)
+  color:      #0D0D0D (black text on gold)
+  border-radius: 999px (pill)
+  box-shadow: 0 4px 16px rgba(255,215,0,0.35)
+  Hover: translateY(-2px) + stronger gold glow
+
+Ghost / Outline button:
+  <a class="sfs-btn sfs-btn-ghost">Learn More</a>
+  background: rgba(255,215,0,0.08)
+  color:      #FFD700
+  border:     1px solid rgba(255,215,0,0.30)
+  Hover: background rgba(255,215,0,0.15), stronger border
+
+Sizes:
+  .sfs-btn-sm  → padding 8px 16px, font 0.875rem
+  .sfs-btn     → padding 12px 24px, font 1rem
+  .sfs-btn-lg  → padding 16px 36px, font 1.125rem
+  .sfs-btn-block → full width, border-radius 12px
+
+
+--------------------------------------------------------------------
+STEP 8 — ANIMATED GOLD PARTICLE BACKGROUND (sfs-bg.js)
+--------------------------------------------------------------------
+Self-injecting — just add the <script> tag, no init needed.
+
+What it does:
+  • Creates a fixed <canvas id="sfs-bg-canvas"> behind all content
+  • Draws 45 drifting gold nodes connected by fading gold lines
+  • Draws 60 twinkling gold sparkles (breathing opacity)
+  • Bounces nodes off edges, pauses when tab is hidden (battery saving)
+  • On mobile (≤768px) halves node and sparkle count automatically
+
+Configuration (edit CONFIG object at top of sfs-bg.js):
+  nodeCount:          45     ← denser = more connections
+  connectionDistance: 160    ← max line length in px
+  nodeSpeed:          0.28   ← drift speed
+  nodeRadius:         2.2    ← dot size
+  goldAlpha:          0.14   ← line opacity
+  sparkleCount:       60     ← twinkling stars
+  sparkleMaxRadius:   1.6    ← max star size
+  sparkleSpeed:       0.008  ← twinkle pulse speed
+  mobileBreakpoint:   768    ← px below which to halve counts
+  pauseOnHide:        true   ← pause when tab not visible
+
+Canvas sits at z-index: -1 (fixed, full viewport, pointer-events:none).
+All other content auto-gets z-index: 1 via CSS rule in sfs-ui.css.
+
+Particle colour: rgba(255,215,0, alpha)  — always gold.
+Sparkle colour:  rgba(255,215,0, 0–0.45) — pulsing.
+
+
+--------------------------------------------------------------------
+STEP 9 — PRICING CARDS
+--------------------------------------------------------------------
+<div class="sfs-price-card">             ← standard
+<div class="sfs-price-card featured">   ← highlighted / most popular
+
+  Inside a pricing card:
+    <h3 class="sfs-h4 sfs-text-gold">Starter</h3>
+    <p class="sfs-text-muted">Tagline</p>
+    <div class="sfs-price-amount">£49<span class="sfs-price-period">/mo</span></div>
+    <ul class="sfs-plan-features">
+      <li>Feature one</li>
+      <li>Feature two</li>
+    </ul>
+    <a href="/checkout" class="sfs-btn sfs-btn-ghost sfs-btn-block">Start Free Trial</a>
+
+Featured card:
+  transform: scale(1.04) — slightly larger than siblings
+  border-color: rgba(255,215,0,0.50)
+  background: linear-gradient(150deg, rgba(255,215,0,0.10), rgba(59,47,47,0.85))
+
+Feature list bullets: gold ✓ character via ::before pseudo-element
+
+
+--------------------------------------------------------------------
+STEP 10 — SECTION LAYOUT
+--------------------------------------------------------------------
+<section class="sfs-section" id="features">
+  <div class="sfs-container">
+    <div class="sfs-section-header">
+      <h2 class="sfs-section-title sfs-gold-text">Heading</h2>
+      <p class="sfs-section-subtitle">Subheading</p>
+    </div>
+    <div class="sfs-grid-3 sfs-stagger">
+      <div class="sfs-card"> ... </div>
+      <div class="sfs-card"> ... </div>
+      <div class="sfs-card"> ... </div>
+    </div>
+  </div>
+</section>
+
+Container: max-width 1200px, 92% wide, centred
+Grid options:
+  .sfs-grid-2 → auto-fit, min 280px columns
+  .sfs-grid-3 → auto-fit, min 260px columns
+  .sfs-grid-4 → auto-fit, min 200px columns
+.sfs-stagger  → staggers children slide-up animations (0.05s–0.40s delays)
+
+Divider between sections:
+  <div class="sfs-divider sfs-container"></div>
+  (1px gradient line: transparent → gold 30% → transparent)
+
+
+--------------------------------------------------------------------
+STEP 11 — TESTIMONIALS
+--------------------------------------------------------------------
+<div class="sfs-testimonial">
+  <blockquote>Quote text here.</blockquote>
+  <cite>— Name, Role</cite>
+</div>
+
+Same glass morphism as cards. Large gold quote mark (opacity 0.30)
+positioned top-left via ::before.
+
+
+--------------------------------------------------------------------
+STEP 12 — FORMS
+--------------------------------------------------------------------
+<div class="sfs-form-group">
+  <label class="sfs-label">Email *</label>
+  <input type="email" class="sfs-input" placeholder="you@example.com" required>
+</div>
+
+Input style:
+  background: rgba(255,255,255,0.05)
+  border:     1px solid rgba(255,215,0,0.20)
+  border-radius: 12px
+  color:      #F5F5DC
+  Focus: border-color #FFD700 + gold glow ring
+
+Two-column row: <div class="sfs-form-row"> wraps 2 .sfs-form-group divs
+                Collapses to single column at ≤600px
+
+
+--------------------------------------------------------------------
+STEP 13 — BADGES
+--------------------------------------------------------------------
+Gold outline:  <span class="sfs-badge sfs-badge-gold">NEW</span>
+Gold solid:    <span class="sfs-badge sfs-badge-solid">POPULAR</span>
+Success:       <span class="sfs-badge sfs-badge-success">LIVE</span>
+
+All badges: pill shape, uppercase, 0.75rem, 600 weight
+
+
+--------------------------------------------------------------------
+STEP 14 — ANIMATIONS (all in sfs-ui.css)
+--------------------------------------------------------------------
+.sfs-animate-fade-in   → fade in 0.6s
+.sfs-animate-slide-up  → slide up + fade 0.6s
+.sfs-animate-scale-in  → scale from 94% + fade 0.5s
+.sfs-stagger > *       → staggered slide-up on each child
+
+Gold text gradient:
+  .sfs-gold-text: background linear-gradient(135deg, #FFD700, #E6C200)
+                  clipped to text (-webkit-background-clip: text)
+
+Animated shimmer on nav/text (Tailwind apps):
+  .text-gold-shine: panning gradient 3.2s linear infinite
+  (gold-gradient: multipoint warm-to-bright-to-warm sweep)
+
+Scrollbar:
+  thumb: rgba(255,215,0,0.25), hover rgba(255,215,0,0.45)
+  track: rgba(255,215,0,0.04)
+
+
+--------------------------------------------------------------------
+STEP 15 — FOOTER
+--------------------------------------------------------------------
+<footer class="sfs-footer">
+  <div class="sfs-container">
+    <p>&copy; 2025 SmartFlow Systems. All rights reserved.</p>
+    <p class="sfs-footer-links">
+      <a href="/">Home</a> &bull;
+      <a href="/pricing">Pricing</a> &bull;
+      <a href="/contact">Contact</a>
+    </p>
+  </div>
+</footer>
+
+border-top: 1px solid rgba(255,215,0,0.12)
+text: centered, muted beige, 0.9rem
+links: gold colour
+
+
+--------------------------------------------------------------------
+STEP 16 — VERIFY CHECKLIST
+--------------------------------------------------------------------
+After applying all steps, confirm:
+  ✓ Background is #0D0D0D (near-black)
+  ✓ Gold particle constellation animation visible behind content
+  ✓ SmartFlow Systems logo shows in navbar (gold, transparent bg)
+  ✓ Buttons are gold-fill or gold-ghost style with pill shape
+  ✓ Cards use glass morphism (dark + blur + gold border + shimmer hover)
+  ✓ Pricing card "featured" is scale(1.04) larger than siblings
+  ✓ Hamburger toggle appears on mobile, opens dark dropdown
+  ✓ Gold gradient scrollbar visible
+  ✓ No inline <style> or <script> blocks (CSP safe)
+  ✓ No 404s in console for /sfs-kit/ files
+
+====================================================================

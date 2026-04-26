@@ -1,6 +1,4 @@
 import { QRCodeSVG } from "qrcode.react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download } from "lucide-react";
 
 interface QrCodeDisplayProps {
@@ -10,55 +8,45 @@ interface QrCodeDisplayProps {
 
 export function QrCodeDisplay({ url, shortCode }: QrCodeDisplayProps) {
   const handleDownload = () => {
-    const svg = document.getElementById("qr-code") as any;
+    const svg = document.getElementById("qr-code") as SVGElement | null;
     if (!svg) return;
-
     const svgData = new XMLSerializer().serializeToString(svg);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     const img = new Image();
-
     canvas.width = 300;
     canvas.height = 300;
-
     img.onload = () => {
       ctx?.drawImage(img, 0, 0);
-      const pngFile = canvas.toDataURL("image/png");
-      const downloadLink = document.createElement("a");
-      downloadLink.download = `qr-${shortCode || "code"}.png`;
-      downloadLink.href = pngFile;
-      downloadLink.click();
+      const a = document.createElement("a");
+      a.download = `qr-${shortCode || "code"}.png`;
+      a.href = canvas.toDataURL("image/png");
+      a.click();
     };
-
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
-    console.log("QR code downloaded");
   };
 
   return (
-    <Card>
-      <CardHeader className="gap-1 space-y-0 pb-4">
-        <CardTitle>QR Code</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex justify-center rounded-md border border-border bg-white p-6">
-          <QRCodeSVG
-            id="qr-code"
-            value={url}
-            size={256}
-            level="H"
-            data-testid="qr-code"
-          />
-        </div>
-        <Button
-          onClick={handleDownload}
-          variant="outline"
-          className="w-full"
-          data-testid="button-download-qr"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          Download PNG
-        </Button>
-      </CardContent>
-    </Card>
+    <div className="glass-card rounded-2xl p-6 space-y-4">
+      <h3 className="font-semibold gold-text">QR Code</h3>
+      <div className="flex justify-center rounded-xl p-5" style={{ background: "#ffffff" }}>
+        <QRCodeSVG id="qr-code" value={url} size={220} level="H" data-testid="qr-code" />
+      </div>
+      <button
+        onClick={handleDownload}
+        data-testid="button-download-qr"
+        className="w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold transition-all duration-200"
+        style={{
+          background: "rgba(255,215,0,0.10)",
+          border: "1px solid rgba(255,215,0,0.35)",
+          color: "#FFD700",
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,215,0,0.18)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,215,0,0.10)"; (e.currentTarget as HTMLElement).style.transform = ""; }}
+      >
+        <Download className="h-4 w-4" />
+        Download PNG
+      </button>
+    </div>
   );
 }
