@@ -1,76 +1,81 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import { Header } from "@/components/Header";
 import { CreateUrlCard } from "@/components/CreateUrlCard";
 import { AnalyticsCards } from "@/components/AnalyticsCards";
 import { UrlTable, type UrlItem } from "@/components/UrlTable";
 import { UrlDetailPanel } from "@/components/UrlDetailPanel";
 import { EmptyState } from "@/components/EmptyState";
-import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+
+interface AnalyticsSummary {
+  totalUrls: number;
+  totalClicks: number;
+  clicksToday: number;
+}
+
+interface UrlAnalytics {
+  chartData: { date: string; clicks: number }[];
+  referrers: { source: string; clicks: number }[];
+}
 
 export default function Dashboard() {
   const [selectedUrl, setSelectedUrl] = useState<UrlItem | null>(null);
-  const [urls, setUrls] = useState<UrlItem[]>([
-    {
-      id: "1",
-      shortCode: "docs",
-      destination: "https://example.com/documentation/getting-started",
-      clicks: 245,
-      created: "Nov 10, 2025",
-    },
-    {
-      id: "2",
-      shortCode: "promo",
-      destination: "https://shop.example.com/summer-sale-2025",
-      clicks: 892,
-      created: "Nov 8, 2025",
-    },
-    {
-      id: "3",
-      shortCode: "app",
-      destination: "https://app.example.com/dashboard",
-      clicks: 156,
-      created: "Nov 5, 2025",
-    },
-  ]);
+  const { toast } = useToast();
 
-  const handleCreateUrl = (data: { url: string; customSlug: string; generateQr: boolean }) => {
-    const newUrl: UrlItem = {
-      id: Date.now().toString(),
-      shortCode: data.customSlug,
+  const { data: urls = [], isLoading: urlsLoading } = useQuery<UrlItem[]>({
+    queryKey: ["/api/urls"],
+  });
+
+  const { data: summary, isLoading: summaryLoading } = useQuery<AnalyticsSummary>({
+    queryKey: ["/api/analytics/summary"],
+  });
+
+  const { data: urlAnalytics } = useQuery<UrlAnalytics>({
+    queryKey: ["/api/urls", selectedUrl?.id, "analytics"],
+    enabled: !!selectedUrl?.id,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: { destination: string; shortCode?: string }) =>
+      apiRequest("POST", "/api/urls", data),
+    onSuccess: async (res) => {
+      const newUrl = await res.json();
+      queryClient.invalidateQueries({ queryKey: ["/api/urls"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/analytics/summary"] });
+      toast({ title: "URL created!", description: `/${newUrl.shortCode} is ready` });
+    },
+    onError: async (err: any) => {
+      let msg = "Failed to create URL";
+      try {
+        const body = await err.json?.();
+        if (body?.error?.shortCode) msg = body.error.shortCode[0];
+        else if (body?.error?.destination) msg = body.error.destination[0];
+      } catch {}
+      toast({ title: "Error", description: msg, variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/urls/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/urls"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/analytics/summary"] });
+      if (selectedUrl) setSelectedUrl(null);
+      toast({ title: "Deleted", description: "URL has been removed" });
+    },
+  });
+
+  const handleCreate = (data: { url: string; customSlug: string; generateQr: boolean }) => {
+    createMutation.mutate({
       destination: data.url,
-      clicks: 0,
-      created: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    };
-    setUrls([newUrl, ...urls]);
-    console.log("New URL created:", newUrl);
+      shortCode: data.customSlug || undefined,
+    });
   };
-
-  const handleDeleteUrl = (id: string) => {
-    setUrls(urls.filter((url) => url.id !== id));
-    if (selectedUrl?.id === id) {
-      setSelectedUrl(null);
-    }
-    console.log("URL deleted:", id);
-  };
-
-  const totalClicks = urls.reduce((sum, url) => sum + url.clicks, 0);
-  const clicksToday = 143;
-
-  const mockClickHistory = [
-    { date: "Nov 8", clicks: 12 },
-    { date: "Nov 9", clicks: 18 },
-    { date: "Nov 10", clicks: 25 },
-    { date: "Nov 11", clicks: 31 },
-    { date: "Nov 12", clicks: 28 },
-    { date: "Nov 13", clicks: 42 },
-    { date: "Nov 14", clicks: selectedUrl ? selectedUrl.clicks % 50 : 35 },
-  ];
-
-  const mockReferrers = [
-    { source: "twitter.com", clicks: 89 },
-    { source: "facebook.com", clicks: 56 },
-    { source: "Direct", clicks: 42 },
-  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -82,23 +87,51 @@ export default function Dashboard() {
             destination={selectedUrl.destination}
             created={selectedUrl.created}
             totalClicks={selectedUrl.clicks}
-            clickHistory={mockClickHistory}
-            referrers={mockReferrers}
+            clickHistory={urlAnalytics?.chartData ?? []}
+            referrers={urlAnalytics?.referrers ?? []}
             onBack={() => setSelectedUrl(null)}
           />
         ) : (
           <div className="space-y-8">
-            <AnalyticsCards
-              totalUrls={urls.length}
-              totalClicks={totalClicks}
-              clicksToday={clicksToday}
+            {summaryLoading ? (
+              <div className="grid gap-6 md:grid-cols-3">
+                {[1, 2, 3].map((i) => (
+                  <Card key={i}>
+                    <CardContent className="p-6">
+                      <Skeleton className="h-8 w-24 mb-2" />
+                      <Skeleton className="h-10 w-16" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <AnalyticsCards
+                totalUrls={summary?.totalUrls ?? 0}
+                totalClicks={summary?.totalClicks ?? 0}
+                clicksToday={summary?.clicksToday ?? 0}
+              />
+            )}
+
+            <CreateUrlCard
+              onSubmit={handleCreate}
+              isPending={createMutation.isPending}
             />
 
-            <CreateUrlCard onSubmit={handleCreateUrl} />
-
-            {urls.length === 0 ? (
+            {urlsLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-14 w-full rounded-md" />
+                ))}
+              </div>
+            ) : urls.length === 0 ? (
               <Card>
-                <EmptyState onCreateClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} />
+                <EmptyState
+                  onCreateClick={() => {
+                    document
+                      .getElementById("destination-url")
+                      ?.focus();
+                  }}
+                />
               </Card>
             ) : (
               <div>
@@ -106,11 +139,8 @@ export default function Dashboard() {
                 <UrlTable
                   urls={urls}
                   onUrlClick={setSelectedUrl}
-                  onDelete={handleDeleteUrl}
-                  onViewQr={(url) => {
-                    setSelectedUrl(url);
-                    console.log("View QR for:", url);
-                  }}
+                  onDelete={(id) => deleteMutation.mutate(id)}
+                  onViewQr={(url) => setSelectedUrl(url)}
                 />
               </div>
             )}

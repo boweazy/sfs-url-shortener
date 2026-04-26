@@ -1,42 +1,34 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Copy, Sparkles } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Sparkles } from "lucide-react";
 
 interface CreateUrlCardProps {
   onSubmit?: (data: { url: string; customSlug: string; generateQr: boolean }) => void;
+  isPending?: boolean;
 }
 
-export function CreateUrlCard({ onSubmit }: CreateUrlCardProps) {
+export function CreateUrlCard({ onSubmit, isPending }: CreateUrlCardProps) {
   const [url, setUrl] = useState("");
   const [customSlug, setCustomSlug] = useState("");
   const [generateQr, setGenerateQr] = useState(true);
-  const [generatedUrl, setGeneratedUrl] = useState("");
-  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const shortCode = customSlug || Math.random().toString(36).substring(2, 8);
-    const shortUrl = `${window.location.origin}/${shortCode}`;
-    setGeneratedUrl(shortUrl);
-    
     if (onSubmit) {
-      onSubmit({ url, customSlug: shortCode, generateQr });
+      onSubmit({ url, customSlug, generateQr });
     }
-    
-    console.log("URL created:", { url, customSlug: shortCode, generateQr });
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(generatedUrl);
-    toast({
-      title: "Copied!",
-      description: "Short URL copied to clipboard",
-    });
+    setUrl("");
+    setCustomSlug("");
   };
 
   return (
@@ -44,7 +36,7 @@ export function CreateUrlCard({ onSubmit }: CreateUrlCardProps) {
       <CardHeader className="gap-1 space-y-0 pb-4">
         <CardTitle className="text-2xl">Create Short URL</CardTitle>
         <CardDescription>
-          Transform long URLs into shareable short links
+          Transform long URLs into shareable short links with optional custom slugs
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -64,17 +56,22 @@ export function CreateUrlCard({ onSubmit }: CreateUrlCardProps) {
 
           <div className="space-y-2">
             <Label htmlFor="custom-slug">
-              Custom Slug <span className="text-muted-foreground">(optional)</span>
+              Custom Slug{" "}
+              <span className="text-muted-foreground">(optional)</span>
             </Label>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground whitespace-nowrap">
+              <span className="text-sm text-muted-foreground whitespace-nowrap shrink-0">
                 {window.location.origin}/
               </span>
               <Input
                 id="custom-slug"
                 placeholder="my-link"
                 value={customSlug}
-                onChange={(e) => setCustomSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                onChange={(e) =>
+                  setCustomSlug(
+                    e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")
+                  )
+                }
                 data-testid="input-custom-slug"
               />
             </div>
@@ -97,30 +94,15 @@ export function CreateUrlCard({ onSubmit }: CreateUrlCardProps) {
             />
           </div>
 
-          <Button type="submit" className="w-full" data-testid="button-create-url">
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isPending}
+            data-testid="button-create-url"
+          >
             <Sparkles className="mr-2 h-4 w-4" />
-            Create Short URL
+            {isPending ? "Creating..." : "Create Short URL"}
           </Button>
-
-          {generatedUrl && (
-            <div className="rounded-md border border-border bg-muted/50 p-4">
-              <p className="text-sm text-muted-foreground mb-2">Your short URL:</p>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 font-mono text-sm" data-testid="text-generated-url">
-                  {generatedUrl}
-                </code>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={handleCopy}
-                  data-testid="button-copy-url"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
         </form>
       </CardContent>
     </Card>
