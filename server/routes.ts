@@ -126,14 +126,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ chartData, referrers });
   });
 
-  // Redirect short URL (must come last)
-  app.get("/:shortCode", async (req: Request, res: Response) => {
+  // Redirect short URL (must come last — only handles valid slug patterns)
+  app.get("/:shortCode([a-z0-9][a-z0-9-]{1,49})", async (req: Request, res: Response) => {
     const { shortCode } = req.params;
-
-    // Skip Vite/API routes
-    if (shortCode.startsWith("api") || shortCode.startsWith("assets") || shortCode.startsWith("src")) {
-      return res.status(404).json({ error: "Not found" });
-    }
 
     const url = await storage.getUrlByShortCode(shortCode);
     if (!url) {
